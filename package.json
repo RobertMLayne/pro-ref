@@ -1,0 +1,56 @@
+{
+  "name": "openalex-citation-fetcher",
+  "version": "1.0.0",
+  "description": "Chrome extension for fetching academic citation metadata and PDFs from OpenAlex",
+  "main": "Extension/popup.js",
+  "scripts": {
+    "build": "npm run lint && npm run test",
+    "lint": "eslint Extension/**/*.js",
+    "lint:fix": "eslint Extension/**/*.js --fix",
+    "test": "jest",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:watch": "jest --watch",
+    "package": "npm run build && zip -r openalex-citation-fetcher.zip Extension/",
+    "dev": "web-ext run --source-dir=Extension",
+    "validate": "web-ext lint --source-dir=Extension"
+  },
+  "keywords": [
+    "chrome-extension",
+    "academic",
+    "citations",
+    "openalex",
+    "doi",
+    "pubmed",
+    "arxiv",
+    "research"
+  ],
+  "author": "Robert M. Layne <robertmlayne@icloud.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RobertMLayne/open-alex.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RobertMLayne/open-alex/issues"
+  },
+  "homepage": "https://github.com/RobertMLayne/open-alex#readme",
+  "devDependencies": {
+    "@types/chrome": "^0.0.246",
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "jest": "^29.7.0",
+    "jest-chrome": "^0.8.0",
+    "web-ext": "^7.8.0"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
+}

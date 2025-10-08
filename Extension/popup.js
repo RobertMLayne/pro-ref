@@ -1,134 +1,334 @@
+/**
+ * OpenAlex Citation Fetcher - Main Popup Script
+ * Enhanced with modular architecture and comprehensive error handling
+ */
+
+// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await initializeExtension();
+  } catch (error) {
+    console.error('Failed to initialize extension:', error);
+    showError('Extension initialization failed. Please reload.');
+  }
+});
+
+/**
+ * Initialize the extension popup
+ */
+async function initializeExtension() {
+  // Check for stored data from context menu
   const data = await chrome.storage.local.get(['lastIdentifier', 'triggerPopup']);
+  
   if (data.triggerPopup && data.lastIdentifier) {
     document.getElementById('identifier').value = data.lastIdentifier;
     await chrome.storage.local.remove('triggerPopup');
   }
-  init();
-});
 
-async function init() {
-  const idInput = document.getElementById('identifier');
-  const fetchBtn = document.getElementById('fetchBtn');
+  // Initialize UI components
+  initializeUI();
+  
+  // Set up event listeners
+  setupEventListeners();
+  
+  // Load user preferences
+  await loadUserPreferences();
+}
+
+/**
+ * Initialize UI components
+ */
+function initializeUI() {
   const statusDiv = document.getElementById('status');
   const errorDiv = document.getElementById('error');
-
-  fetchBtn.addEventListener('click', async () => {
-    statusDiv.textContent = '';
-    errorDiv.textContent = '';
-    let raw = idInput.value.trim();
-    if (!raw) {
-      errorDiv.textContent = 'Enter an identifier.';
-      return;
-    }
-
-    const { lookup, flags, error } = parseInput(raw);
-    if (error) {
-      errorDiv.textContent = error;
-      return;
-    }
-
-    const baseName = sanitizeFilename(lookup);
-    statusDiv.textContent = 'Fetching…';
-
-    try {
-      const oaUrl = `https://api.openalex.org/works/${encodeURIComponent(lookup)}`;
-      const oaResp = await fetch(oaUrl, {
-        headers: {
-          Accept: 'application/json',
-          'User-Agent': 'RIS Fetcher (mailto:robertmlayne@icloud.com)',
-        },
-      });
-
-      if (!oaResp.ok) throw new Error(`OpenAlex ${oaResp.status}`);
-      const meta = await oaResp.json();
-
-      const pdfLink = meta.best_oa_location?.pdf_url ? [meta.best_oa_location.pdf_url] : [];
-
-      // Download PDFs if available
-      for (let i = 0; i < pdfLink.length; i++) {
-        await chrome.downloads.download({
-          url: pdfLink[i],
-          filename: `${baseName}${pdfLink.length > 1 ? `-${i + 1}` : ''}.pdf`,
-        });
-      }
-
-      // Fetch RIS metadata
-      const risResp = await fetch(oaUrl, {
-        headers: { Accept: 'application/x-research-info-systems' },
-      });
-
-      const risText = await risResp.text();
-      console.log('RIS response:', risText);
-
-      if (risResp.ok) {
-        const blob = new Blob([risText], { type: 'application/x-research-info-systems' });
-        const url = URL.createObjectURL(blob);
-        await chrome.downloads.download({ url, filename: `${baseName}.ris` });
-        URL.revokeObjectURL(url);
-      } else {
-        console.error(`Failed to fetch RIS for ${lookup}:`, risText);
-      }
-
-      // Handle flags
-      if (flags.has('--WC')) await fetchCitations(meta.id, baseName, 'referenced_works');
-      if (flags.has('--SW')) await fetchCitations(meta.id, baseName, 'cited_by');
-
-      statusDiv.textContent = 'Done ✔️';
-    } catch (e) {
-      console.error(e);
-      errorDiv.textContent = 'Error: ' + e.message;
-    }
-  });
+  const progressDiv = createProgressIndicator();
+  
+  // Clear any existing content
+  statusDiv.textContent = '';
+  errorDiv.textContent = '';
+  
+  // Add progress indicator
+  document.querySelector('.container').appendChild(progressDiv);
 }
 
-function parseInput(raw) {
-  const parts = raw.split(/\s+/);
-  let idPart = parts.shift();
-  const flags = new Set(parts.filter((p) => /^--(WC|SW|ONN)$/.test(p)));
+/**
+ * Create progress indicator element
+ */
+function createProgressIndicator() {
+  const progressDiv = document.createElement('div');
+  progressDiv.id = 'progress';
+  progressDiv.style.cssText = `
+    margin-top: 10px;
+    padding: 5px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    display: none;
+  `;
+  return progressDiv;
+}
 
-  const prefixMatch = idPart.match(/^([A-Za-z]+):(.+)$/);
-  let prefix, id;
-  if (prefixMatch) {
-    prefix = prefixMatch[1].toLowerCase();
-    id = prefixMatch[2];
+/**
+ * Set up event listeners
+ */
+function setupEventListeners() {
+  const idInput = document.getElementById('identifier');
+  const fetchBtn = document.getElementById('fetchBtn');
+  
+  // Main fetch button
+  fetchBtn.addEventListener('click', handleFetchRequest);
+  
+  // Enter key support
+  idInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      handleFetchRequest();
+    }
+  });
+  
+  // Input validation
+  idInput.addEventListener('input', validateInput);
+  
+  // Help button (if exists)
+  const helpBtn = document.getElementById('helpBtn');
+  if (helpBtn) {
+    helpBtn.addEventListener('click', showHelpDialog);
+  }
+}
+
+/**
+ * Load user preferences from storage
+ */
+async function loadUserPreferences() {
+  try {
+    const prefs = await chrome.storage.sync.get([
+      'defaultFlags',
+      'autoDownloadPdf',
+      'fileNamingPattern'
+    ]);
+    
+    // Apply preferences to UI
+    if (prefs.defaultFlags) {
+      // Could add checkboxes for default flags
+    }
+  } catch (error) {
+    console.warn('Failed to load user preferences:', error);
+  }
+}
+
+/**
+ * Handle fetch request from user
+ */
+async function handleFetchRequest() {
+  const idInput = document.getElementById('identifier');
+  const fetchBtn = document.getElementById('fetchBtn');
+  
+  // Clear previous results
+  clearMessages();
+  
+  const identifier = idInput.value.trim();
+  if (!identifier) {
+    showError(CONFIG.errorMessages.noIdentifier);
+    return;
+  }
+
+  // Disable UI during processing
+  setUIState(false);
+  showProgress('Initializing...');
+
+  try {
+    // Initialize processor
+    const processor = new CitationProcessor(CONFIG);
+    
+    // Parse identifier and flags
+    const parser = new IdentifierParser(CONFIG);
+    const parseResult = parser.parseInput(identifier);
+    
+    if (parseResult.error) {
+      throw new Error(parseResult.error);
+    }
+
+    const { flags } = parseResult;
+    
+    // Update progress
+    showProgress('Fetching metadata...');
+    
+    // Process citation
+    const results = await processor.processCitation(identifier, flags);
+    
+    // Handle results
+    await handleProcessingResults(results);
+    
+  } catch (error) {
+    console.error('Fetch request failed:', error);
+    showError(`Error: ${error.message}`);
+  } finally {
+    // Re-enable UI
+    setUIState(true);
+    hideProgress();
+  }
+}
+
+/**
+ * Handle processing results
+ */
+async function handleProcessingResults(results) {
+  if (!results.success) {
+    throw new Error(results.errors.join('; '));
+  }
+
+  // Show success message with statistics
+  const stats = new CitationProcessor().getProcessingStats(results);
+  showSuccess(formatSuccessMessage(stats));
+  
+  // Store processing results for future reference
+  await chrome.storage.local.set({
+    lastResults: {
+      timestamp: Date.now(),
+      stats: stats,
+      downloads: results.downloads
+    }
+  });
+  
+  // Show download details if in debug mode
+  if (CONFIG.debug) {
+    console.log('Processing results:', results);
+  }
+}
+
+/**
+ * Format success message
+ */
+function formatSuccessMessage(stats) {
+  let message = '✅ Complete! ';
+  
+  if (stats.totalDownloads > 0) {
+    message += `Downloaded ${stats.totalDownloads} file(s)`;
+    
+    const types = Object.keys(stats.downloadsByType);
+    if (types.length > 1) {
+      message += ` (${types.map(type => 
+        `${stats.downloadsByType[type]} ${type.toUpperCase()}`
+      ).join(', ')})`;
+    }
   } else {
-    if (/^10\.\d+\/\S+$/.test(idPart)) prefix = 'doi', id = idPart;
-    else if (/^\d{4}\.\d{4,5}(v\d+)?$/.test(idPart)) prefix = 'arxiv', id = idPart;
-    else if (/^W\d+$/.test(idPart)) prefix = 'openalex', id = idPart;
-    else if (/^PMC\d+$/.test(idPart)) prefix = 'pmcid', id = idPart;
-    else if (/^\d+$/.test(idPart)) return { error: 'All-digit IDs require prefix (pmid:/mag:)' };
-    else return { error: 'Unrecognized identifier format' };
+    message += 'No downloads available';
   }
+  
+  return message;
+}
 
-  let lookup;
-  switch (prefix) {
-    case 'doi': lookup = `https://doi.org/${id}`; break;
-    case 'pmid': lookup = `https://pubmed.ncbi.nlm.nih.gov/${id}`; break;
-    case 'pmcid': lookup = `https://www.ncbi.nlm.nih.gov/pmc/articles/${id}`; break;
-    case 'arxiv': lookup = `https://arxiv.org/abs/${id}`; break;
-    case 'openalex': lookup = id; break;
-    case 'mag': lookup = `https://doi.org/${id}`; break;
-    case 's2': lookup = `https://doi.org/${id}`; break;
-    default: return { error: 'Unsupported prefix' };
+/**
+ * Validate input as user types
+ */
+function validateInput() {
+  const idInput = document.getElementById('identifier');
+  const fetchBtn = document.getElementById('fetchBtn');
+  const identifier = idInput.value.trim();
+  
+  if (!identifier) {
+    fetchBtn.disabled = true;
+    return;
   }
-  return { lookup, flags };
+  
+  // Basic validation
+  const parser = new IdentifierParser(CONFIG);
+  const isValid = parser.isValidIdentifier(identifier.split(/\s+/)[0]);
+  
+  fetchBtn.disabled = !isValid;
+  
+  // Visual feedback
+  idInput.style.borderColor = isValid ? '' : '#ff6b6b';
 }
 
-function sanitizeFilename(name) {
-  return name.replace(/[^a-z0-9_\-\. ]+/gi, ' ').trim().replace(/\s+/g, '_');
+/**
+ * Show help dialog
+ */
+function showHelpDialog() {
+  const helpContent = `
+    Supported identifiers:
+    • DOI: 10.1038/nature12373
+    • PubMed ID: pmid:23685631
+    • PMC ID: PMC4123456
+    • arXiv ID: 1234.5678
+    • OpenAlex ID: W2123456789
+    
+    Flags:
+    • --WC: Download referenced works
+    • --SW: Download citing works
+    
+    Example: "10.1038/nature12373 --WC"
+  `;
+  
+  alert(helpContent);
 }
 
-async function fetchCitations(workId, baseName, type) {
-  const url = `https://api.openalex.org/works/${encodeURIComponent(workId)}/${type}`;
-  const resp = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-      'User-Agent': 'RIS Fetcher (mailto:robertmlayne@icloud.com)',
-    },
-  });
-
-  const data = await resp.json();
-  console.log(type, data);
-  // Extend logic here if you want to download or process citations
+/**
+ * Set UI state (enabled/disabled)
+ */
+function setUIState(enabled) {
+  const idInput = document.getElementById('identifier');
+  const fetchBtn = document.getElementById('fetchBtn');
+  
+  idInput.disabled = !enabled;
+  fetchBtn.disabled = !enabled;
+  fetchBtn.textContent = enabled ? 'Fetch' : 'Processing...';
 }
+
+/**
+ * Show progress message
+ */
+function showProgress(message) {
+  const progressDiv = document.getElementById('progress');
+  progressDiv.textContent = message;
+  progressDiv.style.display = 'block';
+}
+
+/**
+ * Hide progress indicator
+ */
+function hideProgress() {
+  const progressDiv = document.getElementById('progress');
+  progressDiv.style.display = 'none';
+}
+
+/**
+ * Clear all messages
+ */
+function clearMessages() {
+  document.getElementById('status').textContent = '';
+  document.getElementById('error').textContent = '';
+}
+
+/**
+ * Show success message
+ */
+function showSuccess(message) {
+  const statusDiv = document.getElementById('status');
+  statusDiv.textContent = message;
+  statusDiv.style.color = 'green';
+}
+
+/**
+ * Show error message
+ */
+function showError(message) {
+  const errorDiv = document.getElementById('error');
+  errorDiv.textContent = message;
+  errorDiv.style.color = 'red';
+}
+
+/**
+ * Handle extension errors gracefully
+ */
+window.addEventListener('error', (event) => {
+  console.error('Popup error:', event.error);
+  showError('An unexpected error occurred. Please try again.');
+});
+
+/**
+ * Handle unhandled promise rejections
+ */
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+  showError('An unexpected error occurred. Please try again.');
+  event.preventDefault();
+});

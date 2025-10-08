@@ -1,28 +1,65 @@
 {
   "manifest_version": 3,
   "name": "OpenAlex Citation Fetcher",
-  "version": "1.0",
+  "version": "1.1.0",
+  "description": "Fetch academic citation metadata and PDFs from OpenAlex using DOI, PubMed, arXiv, and other identifiers",
+  "author": "Robert M. Layne",
+  "homepage_url": "https://github.com/RobertMLayne/open-alex",
+  
   "permissions": [
     "contextMenus",
     "downloads",
     "storage"
   ],
+  
   "host_permissions": [
     "https://api.openalex.org/*",
     "https://doi.org/*",
     "https://pubmed.ncbi.nlm.nih.gov/*",
+    "https://www.ncbi.nlm.nih.gov/*",
+    "https://arxiv.org/*",
     "https://api.crossref.org/*"
   ],
+  
   "action": {
     "default_popup": "popup.html",
+    "default_title": "Fetch Citation Metadata",
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",
       "128": "icon128.png"
     }
   },
+  
   "background": {
     "service_worker": "background.js",
     "type": "module"
+  },
+  
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["config.js", "utils/*.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  
+  "commands": {
+    "fetch-selected": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Fetch citation for selected text"
+    }
   }
 }
