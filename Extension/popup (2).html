@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fetch Citation Metadata</title>
+  <style>
+    body { font-family: sans-serif; margin: 10px; width: 300px; }
+    input, button { width: 100%; padding: 6px; margin-bottom: 8px; }
+    #status { color: green; }
+    #error  { color: red; }
+  </style>
+</head>
+<body>
+  <h3>Fetch Citation Metadata</h3>
+  <input id="identifier" placeholder="DOI, PubMed ID, etc." />
+  <button id="fetchBtn">Fetch</button>
+  <div id="status"></div>
+  <div id="error"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
