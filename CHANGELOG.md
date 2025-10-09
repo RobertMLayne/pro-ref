@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-10-08
 
 ### Added
+
 - **Modular Architecture**: Refactored codebase into separate utility modules
   - `IdentifierParser`: Handles parsing and validation of academic identifiers
   - `OpenAlexApiClient`: Manages API communication with rate limiting
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Download Statistics**: Detailed feedback on successful downloads
 
 ### Enhanced
+
 - **Citation Processing**: Complete implementation of citation fetching for referenced works and citing works
 - **File Naming**: Improved filename sanitization and conflict resolution
 - **API Integration**: More robust API calls with proper error handling and retries
@@ -29,23 +31,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Comprehensive README with installation and usage instructions
 
 ### Changed
+
 - **File Structure**: Organized code into logical modules in `utils/` directory
 - **Manifest Version**: Updated to version 1.1.0 with enhanced permissions
 - **Dependencies**: Added development dependencies for testing and building
 
 ### Fixed
+
 - **Duplicate Files**: Removed duplicate files with "(2)" suffixes
 - **Empty Directories**: Cleaned up unused "Auto Hotkey" directory
 - **Hard-coded Values**: Moved configuration to external config file
 - **Incomplete Functions**: Fully implemented citation processing functionality
 
 ### Security
+
 - **Content Security Policy**: Added CSP to prevent XSS attacks
 - **Permission Scoping**: Refined host permissions to minimum required scope
 
 ## [1.0.0] - 2025-06-01
 
 ### Added
+
 - Initial release of OpenAlex Citation Fetcher
 - Basic support for DOI, PubMed ID, PMC ID, arXiv ID, and OpenAlex ID
 - Context menu integration for selected text
@@ -54,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Chrome extension popup interface
 
 ### Features
+
 - **Multi-format Support**: Handle various academic identifier formats
 - **Automatic Downloads**: Fetch RIS citation files and PDFs
 - **Context Menu**: Right-click selected text to fetch citations
@@ -62,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
+
 - **Batch Processing**: Support for processing multiple identifiers at once
 - **Export Formats**: Additional export formats (BibTeX, EndNote)
 - **Citation Networks**: Enhanced visualization of citation relationships
