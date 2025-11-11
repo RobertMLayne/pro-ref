@@ -1,21 +1,16 @@
-"""
-Tests for schema dialect configuration module.
-"""
+"""Tests for schema dialect configuration module."""
+
+from __future__ import annotations
 
 import os
-import sys
-from pathlib import Path
 from typing import Any
-
-# Add src directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
 
-from src.utils.schema_dialect import (
-    get_schema_dialect,
-    add_schema_dialect,
+from api_gui.util.schema_dialect import (
     ToolParameterSchema,
+    add_schema_dialect,
+    get_schema_dialect,
 )
 
 

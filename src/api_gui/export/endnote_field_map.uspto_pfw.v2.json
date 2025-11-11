@@ -1,0 +1,59 @@
+{
+  "reference_type": "Patent",
+  "provider": "uspto_odp_pfw",
+  "version": "v2-extended",
+  "notes": "Extended mapping including attorneys/record-attorney and correspondence details.",
+  "transform": {
+    "Title": "applicationMetaData.inventionTitle",
+    "Patent Number": "applicationMetaData.patentNumber",
+    "Application Number": "applicationNumberText",
+    "Assignee/Applicant": [
+      "assignmentBag[].assigneeBag[].assigneeNameText",
+      "applicationMetaData.applicantBag[].applicantNameText"
+    ],
+    "Inventors": [
+      "applicationMetaData.inventorBag[].inventorNameText",
+      "applicationMetaData.inventorBag[].firstName + ' ' + applicationMetaData.inventorBag[].lastName"
+    ],
+    "Filing Date": "applicationMetaData.filingDate",
+    "Issue Date": "applicationMetaData.grantDate",
+    "Publication Date": "applicationMetaData.earliestPublicationDate",
+    "Primary Class": "applicationMetaData.class",
+    "Subclass": "applicationMetaData.subclass",
+    "USPC": "applicationMetaData.uspcSymbolText",
+    "CPC": "applicationMetaData.cpcClassificationBag[]",
+    "Examiner": "applicationMetaData.examinerNameText",
+    "Art Unit": "applicationMetaData.groupArtUnitNumber",
+    "Docket Number": "applicationMetaData.docketNumber",
+    "Priority Data": [
+      "foreignPriorityBag[].ipOfficeName + ' ' + foreignPriorityBag[].applicationNumberText + ' ' + foreignPriorityBag[].filingDate"
+    ],
+    "Continuity - Parent": [
+      "parentContinuityBag[].claimParentageTypeCode + ' ' + parentContinuityBag[].parentApplicationNumberText"
+    ],
+    "Continuity - Child": [
+      "childContinuityBag[].claimParentageTypeCode + ' ' + childContinuityBag[].childApplicationNumberText"
+    ],
+    "URL": "concat('https://data.uspto.gov/patent-file-wrapper/application/', applicationNumberText)",
+    "File Attachments": [
+      "pfw.documents[].downloadUrl",
+      "pfw.documents[].documentURI"
+    ],
+    "Record Attorney - Organization": "recordAttorney.customerNumberCorrespondenceData[].organizationStandardName",
+    "Record Attorney - Phone": "recordAttorney.customerNumberCorrespondenceData[].telecommunicationAddressBag[].telecommunicationNumber",
+    "Record Attorney - Address": [
+      "recordAttorney.customerNumberCorrespondenceData[].powerOfAttorneyAddressBag[].addressLineOneText + ', ' + recordAttorney.customerNumberCorrespondenceData[].powerOfAttorneyAddressBag[].cityName + ', ' + recordAttorney.customerNumberCorrespondenceData[].powerOfAttorneyAddressBag[].geographicRegionCode + ' ' + recordAttorney.customerNumberCorrespondenceData[].powerOfAttorneyAddressBag[].postalCode"
+    ],
+    "Attorney of Record": [
+      "recordAttorney.powerOfAttorneyBag[].firstName + ' ' + recordAttorney.powerOfAttorneyBag[].lastName + ' (Reg. ' + recordAttorney.powerOfAttorneyBag[].registrationNumber + ')'"
+    ],
+    "Attorney Address": [
+      "recordAttorney.powerOfAttorneyBag[].attorneyAddressBag[].addressLineOneText + ', ' + recordAttorney.powerOfAttorneyBag[].attorneyAddressBag[].cityName + ', ' + recordAttorney.powerOfAttorneyBag[].attorneyAddressBag[].geographicRegionCode + ' ' + recordAttorney.powerOfAttorneyBag[].attorneyAddressBag[].postalCode"
+    ],
+    "Correspondence Name": "correspondenceAddressBag[].nameLineOneText",
+    "Correspondence Address": [
+      "correspondenceAddressBag[].addressLineOneText + ', ' + correspondenceAddressBag[].cityName + ', ' + correspondenceAddressBag[].geographicRegionCode + ' ' + correspondenceAddressBag[].postalCode + ', ' + correspondenceAddressBag[].countryName"
+    ],
+    "Abstract": null
+  }
+}

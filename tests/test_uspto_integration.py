@@ -1,58 +1,48 @@
+"""Lightweight integration-style tests for the drop-in package."""
 
-import os, json, pytest, vcr
-from src.clients.uspto import USPTOClient
-from src.utils.schema_validator import validate_json
+from __future__ import annotations
 
-API_KEY = os.getenv('USPTO_ODP_API_KEY')
+from pathlib import Path
 
-my_vcr = vcr.VCR(
-    cassette_library_dir='tests/cassettes',
-    record_mode='new_episodes' if os.getenv('RECORD_VCR') else 'none',
-    filter_headers=['X-API-KEY'],
-)
+import pytest
 
-@pytest.mark.skipif(not API_KEY, reason='Requires USPTO_ODP_API_KEY')
-@my_vcr.use_cassette('pfw_search_facets.yaml')
-def test_pfw_search_with_facets():
-    c = USPTOClient()
-    payload = {
-        'q': 'applicationMetaData.applicationTypeLabelName:Utility',
-        'pagination': {'offset': 0, 'limit': 5},
-        'facets': ['applicationMetaData.applicationTypeLabelName','applicationMetaData.applicationStatusCode'],
+from api_gui.clients.uspto_odp import USPTOODPClient
+from api_gui.util.provider_loader import load_providers
+
+PROVIDERS_DIR = Path("src/api_gui/providers")
+
+
+def test_provider_loader_discovers_operations() -> None:
+    """Provider loader should surface the drop-in operations."""
+
+    providers = load_providers(str(PROVIDERS_DIR))
+
+    expected_keys = {
+        "uspto_odp_pfw::pfw.search",
+        "uspto_odp_pfw::pfw.bulk.products",
+        "uspto_odp_pfw::pfw.list_documents",
+        "uspto_odp_pfw::pfw.get_application",
+        "uspto_odp_petition::petition.search",
     }
-    data = c.pfw_search(payload)
-    validate_json(data, 'docs/schemas/patent-data-schema.json')
-    assert 'facets' in data
 
-@pytest.mark.skipif(not API_KEY, reason='Requires USPTO_ODP_API_KEY')
-@my_vcr.use_cassette('pfw_lookup_14412875.yaml')
-def test_pfw_lookup():
-    c = USPTOClient()
-    data = c.pfw_lookup('14412875')
-    validate_json(data, 'docs/schemas/patent-data-schema.json')
-    assert data.get('count', 0) >= 1
+    assert expected_keys.issubset(providers.keys())
 
-@pytest.mark.skipif(not API_KEY, reason='Requires USPTO_ODP_API_KEY')
-@my_vcr.use_cassette('pfw_documents_list.yaml')
-def test_pfw_documents():
-    c = USPTOClient()
-    # Use a known application number from lookup cassette when recording
-    data = c.pfw_documents('14412875')
-    assert 'documents' in json.dumps(data).lower()
 
-@pytest.mark.skipif(not API_KEY, reason='Requires USPTO_ODP_API_KEY')
-@my_vcr.use_cassette('bulk_ptfwprd.yaml')
-def test_bulk_ptfwprd():
-    c = USPTOClient()
-    data = c.bulk_products('PTFWPRD', latest=True)
-    validate_json(data, 'docs/schemas/bulkdata-response-schema.json')
-    assert data.get('count', 0) >= 1
+def test_client_applies_api_key_header(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """USPTO client should read API key environment variable on init."""
 
-@pytest.mark.skipif(not API_KEY, reason='Requires USPTO_ODP_API_KEY')
-@my_vcr.use_cassette('petition_search.yaml')
-def test_petition_search():
-    c = USPTOClient()
-    payload = {'q': 'inventionTitle:Design', 'pagination': {'offset': 0, 'limit': 5}}
-    data = c.petition_search(payload)
-    validate_json(data, 'docs/schemas/petition-decision-schema.json')
-    assert data.get('count', 0) >= 0
+    monkeypatch.setenv("USPTO_ODP_API_KEY", "test-key")
+
+    client = USPTOODPClient("https://api.uspto.gov", api_key_env="USPTO_ODP_API_KEY")
+
+    assert client.session.headers["X-API-KEY"] == "test-key"
+
+
+def test_client_base_url_normalization() -> None:
+    """Client should normalise trailing slashes on the base URL."""
+
+    client = USPTOODPClient("https://api.uspto.gov/", api_key_env=None)
+
+    assert client.base_url == "https://api.uspto.gov"

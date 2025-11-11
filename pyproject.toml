@@ -19,5 +19,5 @@ dependencies = [
 ]
 
 [tool.pyinstaller]
-# entry point
-script = "src/gui/app.py"
+# entry point matches drop-in package layout
+script = "src/api_gui/__main__.py"

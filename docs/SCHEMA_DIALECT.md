@@ -26,14 +26,14 @@ VS Code's JSON schema validator does not yet support `draft-2020-12` features li
 
 ### Core Implementation
 
-- **`schema_dialect.py`** — Main module with dialect configuration and helper functions
+- **`schema_dialect.py`** — Main module with dialect configuration and helper functions (located under `src/api_gui/util/`)
   - `get_schema_dialect()` — Retrieve current dialect from environment
   - `add_schema_dialect()` — Add dialect metadata to schema dict
   - `ToolParameterSchema` — Helper class for MCP tool parameter schemas
 
 ### Examples & Tests
 
-- **`schema_dialect_examples.py`** — Runnable examples showing usage patterns
+- **`schema_dialect_examples.py`** — Runnable examples showing usage patterns (run with `python -m api_gui.util.schema_dialect_examples`)
   - Scrape tool example
   - Search tool example
   - Environment variable override demonstration
@@ -49,7 +49,7 @@ VS Code's JSON schema validator does not yet support `draft-2020-12` features li
 ### Basic Usage
 
 ```python
-from src.utils.schema_dialect import ToolParameterSchema
+from api_gui.util.schema_dialect import ToolParameterSchema
 
 # Create a tool parameter schema
 input_schema = ToolParameterSchema.from_dict(
@@ -130,10 +130,10 @@ tests/test_schema_dialect.py::test_tool_parameter_schema_without_required PASSED
 
 ```bash
 # Display current dialect and example schemas
-python src/utils/schema_dialect_examples.py
+python -m api_gui.util.schema_dialect_examples
 
 # Or with custom dialect
-FIRECRAWL_JSON_SCHEMA_DIALECT=draft-2020-12 python src/utils/schema_dialect_examples.py
+FIRECRAWL_JSON_SCHEMA_DIALECT=draft-2020-12 python -m api_gui.util.schema_dialect_examples
 ```
 
 ## Implementation Details

@@ -1,6 +1,6 @@
 {
   "provider": "uspto_odp_petition",
-  "name": "USPTO Open Data Portal \u2014 Petition Decisions",
+  "name": "USPTO Open Data Portal \u2014 Petition Decision Search",
   "version": "2025-11-11",
   "base_url": "https://api.uspto.gov",
   "auth": {
@@ -11,21 +11,17 @@
   },
   "docs": {
     "swagger": "https://data.uspto.gov/swagger/index.html",
-    "guide": "https://data.uspto.gov/apis/patent-file-wrapper/search"
+    "guide": "https://data.uspto.gov/apis/petition-decision/search"
   },
   "operation": {
     "op_id": "petition.search",
-    "summary": "Search Petition Decisions",
+    "summary": "Search petition decisions (schema-driven)",
     "method": "POST",
-    "path": "/api/v1/petition/decisions/search",
+    "path": "/api/v1/petition-decisions/search",
     "alt": [
       {
         "method": "GET",
-        "path": "/api/v1/petition/decisions/search"
-      },
-      {
-        "method": "GET",
-        "path": "/api/v1/petition/decisions/{petitionDecisionRecordIdentifier}"
+        "path": "/api/v1/petition-decisions/search"
       }
     ],
     "request": {
@@ -51,18 +47,6 @@
               "null"
             ]
           },
-          "sort": {
-            "type": [
-              "array",
-              "null"
-            ]
-          },
-          "fields": {
-            "type": [
-              "array",
-              "null"
-            ]
-          },
           "pagination": {
             "type": "object",
             "properties": {
@@ -75,12 +59,6 @@
                 "default": 25
               }
             }
-          },
-          "facets": {
-            "type": [
-              "array",
-              "null"
-            ]
           }
         }
       }

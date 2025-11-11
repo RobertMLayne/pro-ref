@@ -1,32 +1,29 @@
-"""
-Example usage of the schema dialect configuration module.
+"""Example usage for the schema dialect configuration helpers."""
 
-This demonstrates how to use the configurable JSON Schema dialect
-support for MCP tool parameters and other integrations.
-"""
+from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import Any
 
-# Add parent directory to path if running directly
-if __name__ == "__main__":
-    sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from schema_dialect import (
+from api_gui.util.schema_dialect import (
     ToolParameterSchema,
-    get_schema_dialect,
     add_schema_dialect,
+    get_schema_dialect,
 )
 
 
 def example_scrape_tool() -> dict[str, Any]:
-    """
-    Example: Define a web scraping tool with configurable schema dialect.
+    """Return an example schema for a scrape tool.
 
-    Shows how to use ToolParameterSchema to create consistent parameter
-    schemas that work across different dialect versions.
+    Returns:
+        A JSON Schema-compliant mapping for scrape tool parameters.
     """
+
     input_schema = ToolParameterSchema.from_dict(
         properties={
             "url": {
@@ -36,7 +33,7 @@ def example_scrape_tool() -> dict[str, Any]:
             },
             "wait_for": {
                 "type": "string",
-                "description": ("CSS selector to wait for before returning. Optional."),
+                "description": "CSS selector to wait for before returning.",
             },
             "timeout": {
                 "type": "integer",
@@ -55,12 +52,12 @@ def example_scrape_tool() -> dict[str, Any]:
 
 
 def example_search_tool() -> dict[str, Any]:
-    """
-    Example: Define a search tool using inline schema creation.
+    """Return an example schema for a search tool.
 
-    Demonstrates creating a schema from a dict then wrapping it
-    with dialect support.
+    Returns:
+        A JSON Schema-compliant mapping for search tool parameters.
     """
+
     base_schema: dict[str, Any] = {
         "type": "object",
         "properties": {
@@ -84,7 +81,6 @@ def example_search_tool() -> dict[str, Any]:
         "description": "Search API parameters",
     }
 
-    # Add dialect support (draft-7 by default, or override)
     input_schema = add_schema_dialect(base_schema)
 
     return {
@@ -95,23 +91,25 @@ def example_search_tool() -> dict[str, Any]:
 
 
 def print_dialect_info() -> None:
-    """Print the current schema dialect configuration."""
+    """Print the currently configured dialect."""
+
     dialect = get_schema_dialect()
     print(f"Current JSON Schema dialect: {dialect}")
     print("(Override via FIRECRAWL_JSON_SCHEMA_DIALECT env var)")
-    print()
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Display example schemas for quick inspection."""
+
     print_dialect_info()
 
     print("Scrape tool schema:")
-    scrape_tool = example_scrape_tool()
-    import json
-
-    print(json.dumps(scrape_tool, indent=2))
+    print(json.dumps(example_scrape_tool(), indent=2))
     print()
 
     print("Search tool schema:")
-    search_tool = example_search_tool()
-    print(json.dumps(search_tool, indent=2))
+    print(json.dumps(example_search_tool(), indent=2))
+
+
+if __name__ == "__main__":
+    main()

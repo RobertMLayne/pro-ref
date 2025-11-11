@@ -1,32 +1,41 @@
 
-name: ci
+name: CI
 
 on:
   push:
-  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: "0 6 * * *"  # nightly
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-      - name: Run tests (offline cassettes)
-        env:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+      - env:
           USPTO_ODP_API_KEY: ${{ secrets.USPTO_ODP_API_KEY }}
-        run: |
-          pytest -q || echo "Tests may be skipped without API key or cassettes."
-      - name: Build app zip
-        run: |
-          powershell -command "Compress-Archive -Path src,run.py,pyproject.toml -DestinationPath pro-ref-artifact.zip"
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+          VCR_MODE: none
+        run: pytest -q
+      - uses: actions/upload-artifact@v4
         with:
-          name: pro-ref-artifact
-          path: pro-ref-artifact.zip
+          name: test-logs
+          path: .pytest_cache
+
+  build-windows:
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -r requirements.txt
+      - run: pyinstaller -F -n api-gui src/api_gui/__main__.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-gui-windows
+          path: dist/api-gui.exe

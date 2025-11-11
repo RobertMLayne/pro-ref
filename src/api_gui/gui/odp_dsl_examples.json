@@ -1,0 +1,8 @@
+{
+  "free_form": "q=Design",
+  "dsl_field_search": "applicationMetaData.applicationTypeLabelName:Utility",
+  "phrase": "\"Patented Case\" (Remember to URL-encode quotes as %22 for GET)",
+  "and_or": "Micro AND (Utility OR Design)",
+  "wildcard": "applicationMetaData.firstApplicantName:Technolog*",
+  "range_date": "applicationMetaData.filingDate:[2024-01-01 TO 2024-08-30]"
+}

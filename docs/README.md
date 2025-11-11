@@ -1,35 +1,33 @@
 
-# Pro-Ref (USPTO ODP — PFW)
+# pro-ref — USPTO ODP PFW GUI (desktop)
 
-Dynamic, schema-driven GUI for USPTO Open Data Portal (PFW) with descriptors for Search, Lookup, Documents, Bulk, and Petition Decisions. 
-- **Facets panel**: click to push filters and auto re-query.
-- **GET composer**: build query URLs with encoding tips; retry with one click.
-- **Presets**: save/load POST payloads.
-- **Download manager**: resumable downloads for bulk files.
-- **EndNote Exporter**: RIS with attorneys/correspondence mapping; companion EndNote 2025 table in `docs/endnote/`.
-- **TTKBootstrap themes**: Lumenci light/dark/high-contrast.
+**What you get:** dynamic, schema-driven GUI for USPTO Patent File Wrapper (PFW) with documents, bulk browser, a GET composer, preset manager, EndNote export, VCR test suite, and CI.
 
-## Quickstart
+## Quick start
 ```bash
-python -m pip install -e .
-set USPTO_ODP_API_KEY=...   # or use Settings dialog
-python run.py
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+python -m api_gui
 ```
 
-## Recording VCR cassettes
-Set env `USPTO_ODP_API_KEY` and `RECORD_VCR=1` then run:
+### Record VCR cassettes (live)
 ```bash
-pytest -q
+export USPTO_ODP_API_KEY=...   # set your key
+python scripts/record_cassettes.py
 ```
-Cassettes will be created under `tests/cassettes/` and committed.
 
-## Schemas & Validation
-Tests assert responses against JSON Schemas in `docs/schemas/`.
+### EndNote
+- Mapping: `src/api_gui/export/endnote_field_map.uspto_pfw.json`
+- Custom Reference Type Table (EndNote 2025): `src/api_gui/export/EndNote_2025_for_Windows_Custom_Reference_Type_Table.xml`
+- Exporter: `src/api_gui/export/endnote_export.py`
 
-## Packaging
-- GitHub Action `windows-installer` builds a signed MSI (if secrets provided).
-- CI uploads zip artifacts from main branch.
+### Schemas
+- PFW response: `src/api_gui/schemas/patent-data-schema.json`
+- Bulk listing: `src/api_gui/schemas/bulkdata-response-schema.json`
+- Petition decision: `src/api_gui/schemas/petition-decision-schema.json`
 
-## Screenshots/GIFs
-Put captures under `/docs/images`. (Optional script: `scripts/capture.py` can be added to automate.)
+### CI
+- GitHub Actions workflow builds and uploads nightly artifact, and (optionally) Windows installer via PyInstaller.
 
+### Screenshots/GIFs
+Commit them under `docs/images/`.
