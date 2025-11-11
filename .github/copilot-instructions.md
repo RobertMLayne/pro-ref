@@ -8,6 +8,14 @@ Keep it short, concrete and focused on discoverable, repo-specific patterns.
 Purpose
 - Short orientation to the projects' architecture, developer workflows, and code patterns so an automated assistant can make useful, low-risk changes.
 
+Language and security standards
+- This repository uses language-specific instruction files under `.github/instructions/` that complement this guide:
+  - `python.instructions.md` — Python 3.13, type hints, Black (79 col), pytest, dataclasses
+  - `typescript.instructions.md` — TS strict mode, immutability, React hooks, Vitest
+  - `rust.instructions.md` — clippy clean, error propagation, benchmarks
+  - `security.instructions.md` — secrets management, input validation, web app security
+- These files apply globally to their respective file types and define standards for formatting, testing, and safety.
+
 Agent operating rules
 - Obey repository instructions and lint/format configs already present. Never bypass tests or security checks.
 - Prefer behavior-preserving changes. For non-trivial edits: plan → write tests → minimal change → update docs.
