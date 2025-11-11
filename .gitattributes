@@ -1,8 +1,24 @@
-*.iso filter=lfs diff=lfs merge=lfs -text
-*.psd filter=lfs diff=lfs merge=lfs -text
-*.mp4 filter=lfs diff=lfs merge=lfs -text
+# ─────────────────────────────────────────────────────────────────────────────
+# .gitattributes – Root of your dotfiles repo
+# This file configures how Git handles file content, line endings and large/binary files
+# ─────────────────────────────────────────────────────────────────────────────
+
+# 1) Normalize all text files by default
+#    Ensures Git auto-detects text files and stores them with LF endings in the repository.
+*    text=auto
+
+# 2) Exclude large binary assets from normal text processing and track via Git LFS
+#    These files are binary in nature — we disable text diff/merge, and apply the LFS filter.
+*.7z   filter=lfs diff=lfs merge=lfs -text
+*.iso  filter=lfs diff=lfs merge=lfs -text
+*.psd  filter=lfs diff=lfs merge=lfs -text
+*.mp4  filter=lfs diff=lfs merge=lfs -text
 *.docx filter=lfs diff=lfs merge=lfs -text
 *.xlsx filter=lfs diff=lfs merge=lfs -text
-*.pdf filter=lfs diff=lfs merge=lfs -text
-*.zip filter=lfs diff=lfs merge=lfs -text
-*.7z filter=lfs diff=lfs merge=lfs -text
+*.pdf  filter=lfs diff=lfs merge=lfs -text
+*.zip  filter=lfs diff=lfs merge=lfs -text
+
+# ─────────────────────────────────────────────────────────────────────────────
+# End of .gitattributes
+# Commit this file so all clones honour the same rules
+# ─────────────────────────────────────────────────────────────────────────────
