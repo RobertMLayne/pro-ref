@@ -16,6 +16,29 @@ Language and security standards
   - `security.instructions.md` — secrets management, input validation, web app security
 - These files apply globally to their respective file types and define standards for formatting, testing, and safety.
 
+Repository instructions
+
+- Language defaults
+  - Python: 3.13, type hints everywhere; format with `black --line-length 79 --skip-string-normalization --safe`; lint with Flake8; tests with pytest.
+  - TypeScript: strict mode, ES2022+, no implicit `any`, prefer readonly immutability.
+  - Rust: stable, `clippy` clean, `cargo fmt` with default style.
+  - YAML: validate against schemas; no tabs; anchors allowed where supported.
+
+- Code quality
+  - Prefer small pure functions, clear names, and total functions where practical.
+  - Include docstrings and examples. Add invariants and pre/postconditions as comments.
+  - Add property-based or table-driven tests where valuable.
+
+- PR hygiene
+  - Keep changesets minimal. Include migration notes when public APIs change.
+  - Commit titles: `<area>: <imperative>`; body with rationale and risk.
+
+- Performance
+  - Measure before optimizing. Include a micro or integration benchmark when claiming speedups.
+
+- Documentation
+  - Update `/docs` and the top-level README when behavior changes.
+
 Agent operating rules
 - Obey repository instructions and lint/format configs already present. Never bypass tests or security checks.
 - Prefer behavior-preserving changes. For non-trivial edits: plan → write tests → minimal change → update docs.

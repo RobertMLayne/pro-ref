@@ -1,0 +1,33 @@
+{
+    // Reader: gather context fast
+    "reader": {
+        "tools": [
+            "changes",
+            "codebase",
+            "problems",
+            "usages"
+        ],
+        "description": "Read diffs and search the codebase",
+        "icon": "book"
+    },
+    // Implement: minimal, test-first edits
+    "implement": {
+        "tools": [
+            "codebase",
+            "search",
+            "problems"
+        ],
+        "description": "Edit with context and diagnostics",
+        "icon": "edit"
+    },
+    // Security: conservative set for audits
+    "security": {
+        "tools": [
+            "fetch",
+            "codebase",
+            "search"
+        ],
+        "description": "Security review and external references",
+        "icon": "shield"
+    }
+}
