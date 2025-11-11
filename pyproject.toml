@@ -1,0 +1,23 @@
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pro-ref"
+version = "0.1.0"
+description = "Dynamic multi-API GUI for USPTO ODP PFW and more"
+authors = [{name="Lumenci"}]
+dependencies = [
+    "ttkbootstrap>=1.10.1",
+    "requests>=2.32.3",
+    "jsonschema>=4.21.1",
+    "pillow>=10.4.0",
+    "vcrpy>=6.0.1",
+    "pytest>=8.2.0",
+    "pyinstaller>=6.11.0"
+]
+
+[tool.pyinstaller]
+# entry point
+script = "src/gui/app.py"

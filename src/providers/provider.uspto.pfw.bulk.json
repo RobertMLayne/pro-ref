@@ -1,0 +1,56 @@
+{
+  "provider": "uspto_odp_pfw",
+  "name": "USPTO Open Data Portal — PFW Bulk Datasets",
+  "version": "2025-11-11",
+  "base_url": "https://api.uspto.gov",
+  "auth": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-API-KEY",
+    "env_var": "USPTO_ODP_API_KEY"
+  },
+  "docs": {
+    "swagger": "https://data.uspto.gov/swagger/index.html",
+    "bulk_directory": "https://data.uspto.gov/bulkdata/"
+  },
+  "operation": {
+    "op_id": "pfw.bulk.products",
+    "summary": "List PFW product files",
+    "method": "GET",
+    "path": "/api/v1/datasets/products/{productIdentifier}",
+    "params": {
+      "path": {
+        "productIdentifier": {
+          "type": "string",
+          "enum": [
+            "PTFWPRE",
+            "PTFWPRD"
+          ]
+        }
+      },
+      "query": {
+        "latest": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "response": {
+      "schema_hint": "See bulkdata-response-schema.json -> bulkDataProductBag[].productFileBag.fileDataBag"
+    },
+    "download_helper": {
+      "method": "GET",
+      "path": "/api/v1/datasets/products/files/{productIdentifier}/{fileName}",
+      "params": {
+        "path": {
+          "productIdentifier": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

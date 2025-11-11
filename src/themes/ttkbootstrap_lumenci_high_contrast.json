@@ -1,0 +1,27 @@
+{
+  "name": "lumenci_high_contrast",
+  "label": "Lumenci High Contrast",
+  "type": "dark",
+  "colors": {
+    "primary": "#00FFFF",
+    "secondary": "#FFD700",
+    "success": "#00FF00",
+    "info": "#00BFFF",
+    "warning": "#FFA500",
+    "danger": "#FF0000",
+    "light": "#FFFFFF",
+    "dark": "#000000",
+    "bg": "#000000",
+    "fg": "#FFFFFF"
+  },
+  "fonts": {
+    "family": "Segoe UI",
+    "size": 10,
+    "heading_size": 12,
+    "monospace": "Consolas"
+  },
+  "scales": {
+    "padding": 6,
+    "roundness": 6
+  }
+}

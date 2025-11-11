@@ -1,0 +1,27 @@
+{
+  "name": "lumenci_dark",
+  "label": "Lumenci Dark",
+  "type": "dark",
+  "colors": {
+    "primary": "#8AB4F8",
+    "secondary": "#95A3C7",
+    "success": "#57D9A3",
+    "info": "#52B7D8",
+    "warning": "#FFD166",
+    "danger": "#FF6B6B",
+    "light": "#E9ECEF",
+    "dark": "#0F1113",
+    "bg": "#0F1113",
+    "fg": "#E9ECEF"
+  },
+  "fonts": {
+    "family": "Segoe UI",
+    "size": 10,
+    "heading_size": 12,
+    "monospace": "Consolas"
+  },
+  "scales": {
+    "padding": 6,
+    "roundness": 6
+  }
+}

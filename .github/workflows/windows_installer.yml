@@ -1,0 +1,64 @@
+
+name: windows-installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-msi:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pyinstaller
+      - name: Build EXE
+        run: |
+          pyinstaller --noconfirm --onefile --name pro-ref --add-data "src;src" run.py
+      - name: Install WiX
+        run: choco install wixtoolset --no-progress -y
+      - name: Build MSI with WiX
+        shell: pwsh
+        run: |
+          $env:WIX=C:\ProgramData\chocolatey\lib\wixtoolset\tools
+          echo '<?xml version="1.0" encoding="UTF-8"?>
+          <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+            <Product Id="*" Name="Pro-Ref" Language="1033" Version="1.0.0" Manufacturer="Lumenci" UpgradeCode="D1F9C9BE-0000-4000-8000-000000000000">
+              <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine"/>
+              <MediaTemplate/>
+              <Directory Id="TARGETDIR" Name="SourceDir">
+                <Directory Id="ProgramFilesFolder">
+                  <Directory Id="INSTALLFOLDER" Name="Pro-Ref"/>
+                </Directory>
+              </Directory>
+              <DirectoryRef Id="INSTALLFOLDER">
+                <Component Id="MainExe" Guid="*"> 
+                  <File Id="ProRefExe" Source="dist\pro-ref.exe" KeyPath="yes"/>
+                </Component>
+              </DirectoryRef>
+              <Feature Id="MainFeature" Level="1">
+                <ComponentRef Id="MainExe"/>
+              </Feature>
+            </Product>
+          </Wix>' | Out-File product.wxs -Encoding utf8
+          & $env:WIX\candle.exe product.wxs -o product.wixobj
+          & $env:WIX\light.exe product.wixobj -o pro-ref.msi
+      - name: Code sign (optional)
+        if: ${{ secrets.WINDOWS_CERT_PFX != '' }}
+        shell: pwsh
+        run: |
+          $pfx= "$env:RUNNER_TEMP\cert.pfx"
+          Set-Content -Path $pfx -Value ([Convert]::FromBase64String('${{ secrets.WINDOWS_CERT_PFX }}')) -AsByteStream
+          & "C:\Program Files (x86)\Windows Kits\10\App Certification Kit\signtool.exe" sign /f $pfx /p "${{ secrets.WINDOWS_CERT_PWD }}" /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 pro-ref.msi
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: pro-ref-msi
+          path: pro-ref.msi

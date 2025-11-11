@@ -1,0 +1,44 @@
+{
+  "reference_type": "Patent",
+  "provider": "uspto_odp_pfw",
+  "version": "2025-11-11",
+  "notes": "Map PFW fields to EndNote 'Patent' fields; arrays are joined with '; ' during export.",
+  "transform": {
+    "Title": "applicationMetaData.inventionTitle",
+    "Patent Number": "applicationMetaData.patentNumber",
+    "Application Number": "applicationNumberText",
+    "Assignee/Applicant": [
+      "assignmentBag[].assigneeBag[].assigneeNameText",
+      "applicationMetaData.applicantBag[].applicantNameText"
+    ],
+    "Inventors": [
+      "applicationMetaData.inventorBag[].inventorNameText",
+      "applicationMetaData.inventorBag[].firstName + ' ' + applicationMetaData.inventorBag[].lastName"
+    ],
+    "Filing Date": "applicationMetaData.filingDate",
+    "Issue Date": "applicationMetaData.grantDate",
+    "Publication Date": "applicationMetaData.earliestPublicationDate",
+    "Primary Class": "applicationMetaData.class",
+    "Subclass": "applicationMetaData.subclass",
+    "USPC": "applicationMetaData.uspcSymbolText",
+    "CPC": "applicationMetaData.cpcClassificationBag[]",
+    "Examiner": "applicationMetaData.examinerNameText",
+    "Art Unit": "applicationMetaData.groupArtUnitNumber",
+    "Docket Number": "applicationMetaData.docketNumber",
+    "Priority Data": [
+      "foreignPriorityBag[].ipOfficeName + ' ' + foreignPriorityBag[].applicationNumberText + ' ' + foreignPriorityBag[].filingDate"
+    ],
+    "Continuity - Parent": [
+      "parentContinuityBag[].claimParentageTypeCode + ' ' + parentContinuityBag[].parentApplicationNumberText"
+    ],
+    "Continuity - Child": [
+      "childContinuityBag[].claimParentageTypeCode + ' ' + childContinuityBag[].childApplicationNumberText"
+    ],
+    "URL": "concat('https://data.uspto.gov/patent-file-wrapper/application/', applicationNumberText)",
+    "File Attachments": [
+      "pfw.documents[].downloadUrl",
+      "pfw.documents[].documentURI"
+    ],
+    "Abstract": null
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "provider": "uspto_odp_pfw",
+  "name": "USPTO Open Data Portal — Patent File Wrapper: Documents",
+  "version": "2025-11-11",
+  "base_url": "https://api.uspto.gov",
+  "auth": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-API-KEY",
+    "env_var": "USPTO_ODP_API_KEY"
+  },
+  "docs": {
+    "swagger": "https://data.uspto.gov/swagger/index.html",
+    "guide": "https://data.uspto.gov/apis/patent-file-wrapper/search"
+  },
+  "operation": {
+    "op_id": "pfw.list_documents",
+    "summary": "List document metadata for an application; includes download options",
+    "method": "GET",
+    "path": "/api/v1/patent/applications/{applicationNumberText}/documents",
+    "params": {
+      "path": {
+        "applicationNumberText": {
+          "type": "string",
+          "example": "16123123"
+        }
+      }
+    },
+    "response": {
+      "schema_hint": "Returns a bag of documents with codes, descriptions, and download options; properties may include downloadUrl or documentURI depending on dataset."
+    },
+    "followup": [
+      {
+        "op_id": "pfw.download_document",
+        "summary": "Download a document by identifier and format",
+        "method": "GET",
+        "path": "/api/v1/download/applications/{applicationNumberText}/{documentIdentifier}.{ext}",
+        "params": {
+          "path": {
+            "applicationNumberText": {
+              "type": "string"
+            },
+            "documentIdentifier": {
+              "type": "string"
+            },
+            "ext": {
+              "type": "string",
+              "enum": [
+                "pdf",
+                "xml",
+                "docx"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "lumenci_light",
+  "label": "Lumenci Light",
+  "type": "light",
+  "colors": {
+    "primary": "#4C6FFF",
+    "secondary": "#7B8AB8",
+    "success": "#2EB67D",
+    "info": "#17A2B8",
+    "warning": "#FFB020",
+    "danger": "#D64545",
+    "light": "#FFFFFF",
+    "dark": "#1E2125",
+    "bg": "#FFFFFF",
+    "fg": "#1E2125"
+  },
+  "fonts": {
+    "family": "Segoe UI",
+    "size": 10,
+    "heading_size": 12,
+    "monospace": "Consolas"
+  },
+  "scales": {
+    "padding": 6,
+    "roundness": 6
+  }
+}

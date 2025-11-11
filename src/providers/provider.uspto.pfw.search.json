@@ -1,0 +1,274 @@
+{
+  "provider": "uspto_odp_pfw",
+  "name": "USPTO Open Data Portal — Patent File Wrapper: Search",
+  "version": "2025-11-11",
+  "base_url": "https://api.uspto.gov",
+  "auth": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-API-KEY",
+    "env_var": "USPTO_ODP_API_KEY"
+  },
+  "docs": {
+    "swagger": "https://data.uspto.gov/swagger/index.html",
+    "guide": "https://data.uspto.gov/apis/patent-file-wrapper/search",
+    "schema_fields": "https://data.uspto.gov/documents/documents/patent-data-schema.json"
+  },
+  "operation": {
+    "op_id": "pfw.search",
+    "summary": "Search patent applications (PFW)",
+    "method": "POST",
+    "path": "/api/v1/patent/applications/search",
+    "alt": [
+      {
+        "method": "GET",
+        "path": "/api/v1/patent/applications/search",
+        "notes": "Accepts q, filters, rangeFilters, sort, fields, offset, limit as query params (URL encoded)."
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/patent/applications/search/download",
+        "notes": "Small-result download helper (~6MB cap)."
+      }
+    ],
+    "request": {
+      "contentType": "application/json",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "filters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Qualified field name"
+                },
+                "value": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "value"
+              ]
+            }
+          },
+          "rangeFilters": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "valueFrom": {
+                  "type": "string"
+                },
+                "valueTo": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "field",
+                "valueFrom",
+                "valueTo"
+              ]
+            }
+          },
+          "sort": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "order": {
+                  "type": "string",
+                  "enum": [
+                    "asc",
+                    "desc",
+                    "ASC",
+                    "DESC"
+                  ]
+                }
+              },
+              "required": [
+                "field",
+                "order"
+              ]
+            }
+          },
+          "fields": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "offset": {
+                "type": "integer",
+                "default": 0,
+                "minimum": 0
+              },
+              "limit": {
+                "type": "integer",
+                "default": 25,
+                "minimum": 1
+              }
+            }
+          },
+          "facets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ui": {
+        "field_lists": {
+          "schema_fields_url": "https://data.uspto.gov/documents/documents/patent-data-schema.json"
+        },
+        "layout": [
+          {
+            "group": "Query",
+            "fields": [
+              "q"
+            ]
+          },
+          {
+            "group": "Filters",
+            "repeat": true,
+            "fields": [
+              "filters[].name",
+              "filters[].value[]"
+            ],
+            "choices": {
+              "filters[].name": "schema_fields_url"
+            }
+          },
+          {
+            "group": "Range Filters",
+            "repeat": true,
+            "fields": [
+              "rangeFilters[].field",
+              "rangeFilters[].valueFrom",
+              "rangeFilters[].valueTo"
+            ],
+            "choices": {
+              "rangeFilters[].field": "schema_fields_url"
+            }
+          },
+          {
+            "group": "Sort",
+            "repeat": true,
+            "fields": [
+              "sort[].field",
+              "sort[].order"
+            ],
+            "choices": {
+              "sort[].field": "schema_fields_url"
+            }
+          },
+          {
+            "group": "Fields",
+            "fields": [
+              "fields[]"
+            ],
+            "help": "Restrict returned fields; supports wildcards"
+          },
+          {
+            "group": "Pagination",
+            "fields": [
+              "pagination.offset",
+              "pagination.limit"
+            ]
+          },
+          {
+            "group": "Facets",
+            "fields": [
+              "facets[]"
+            ]
+          }
+        ]
+      },
+      "examples": {
+        "free_form": {
+          "q": "Design",
+          "pagination": {
+            "offset": 0,
+            "limit": 25
+          }
+        },
+        "dsl_simple_query": {
+          "q": "applicationMetaData.applicationTypeLabelName:Utility",
+          "pagination": {
+            "offset": 0,
+            "limit": 25
+          }
+        },
+        "filters_and_date_range": {
+          "q": null,
+          "filters": [
+            {
+              "name": "applicationMetaData.applicationStatusDescriptionText",
+              "value": [
+                "Patented Case"
+              ]
+            }
+          ],
+          "rangeFilters": [
+            {
+              "field": "applicationMetaData.grantDate",
+              "valueFrom": "2010-08-04",
+              "valueTo": "2022-08-04"
+            }
+          ],
+          "sort": [
+            {
+              "field": "applicationMetaData.filingDate",
+              "order": "desc"
+            }
+          ],
+          "pagination": {
+            "offset": 0,
+            "limit": 25
+          }
+        }
+      }
+    },
+    "response": {
+      "schema_hint": "See patent-data-schema.json -> patentFileWrapperDataBag",
+      "primary_collection": "patentFileWrapperDataBag"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "provider": "uspto_odp_petition",
+  "name": "USPTO Open Data Portal \u2014 Petition Decisions",
+  "version": "2025-11-11",
+  "base_url": "https://api.uspto.gov",
+  "auth": {
+    "type": "apiKey",
+    "in": "header",
+    "name": "X-API-KEY",
+    "env_var": "USPTO_ODP_API_KEY"
+  },
+  "docs": {
+    "swagger": "https://data.uspto.gov/swagger/index.html",
+    "guide": "https://data.uspto.gov/apis/patent-file-wrapper/search"
+  },
+  "operation": {
+    "op_id": "petition.search",
+    "summary": "Search Petition Decisions",
+    "method": "POST",
+    "path": "/api/v1/petition/decisions/search",
+    "alt": [
+      {
+        "method": "GET",
+        "path": "/api/v1/petition/decisions/search"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/petition/decisions/{petitionDecisionRecordIdentifier}"
+      }
+    ],
+    "request": {
+      "contentType": "application/json",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "filters": {
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "rangeFilters": {
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "sort": {
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "fields": {
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "offset": {
+                "type": "integer",
+                "default": 0
+              },
+              "limit": {
+                "type": "integer",
+                "default": 25
+              }
+            }
+          },
+          "facets": {
+            "type": [
+              "array",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "response": {
+      "schema_hint": "See petition-decision-schema.json -> petitionDecisionDataBag"
+    }
+  }
+}
