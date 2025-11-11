@@ -39,6 +39,11 @@ Repository instructions
 - Documentation
   - Update `/docs` and the top-level README when behavior changes.
 
+- MCP tools and JSON Schema
+  - Tool parameters should emit `draft-7` JSON schemas by default (compatible with current VS Code).
+  - VS Code's JSON validator does not yet support `draft-2020-12` features; server-side dialect switching is preferred over waiting for editor upgrades.
+  - See `typescript.instructions.md` for Zod implementation details and dialect configuration.
+
 Agent operating rules
 - Obey repository instructions and lint/format configs already present. Never bypass tests or security checks.
 - Prefer behavior-preserving changes. For non-trivial edits: plan → write tests → minimal change → update docs.
