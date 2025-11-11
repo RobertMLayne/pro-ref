@@ -8,6 +8,16 @@ Keep it short, concrete and focused on discoverable, repo-specific patterns.
 Purpose
 - Short orientation to the projects' architecture, developer workflows, and code patterns so an automated assistant can make useful, low-risk changes.
 
+Agent operating rules
+- Obey repository instructions and lint/format configs already present. Never bypass tests or security checks.
+- Prefer behavior-preserving changes. For non-trivial edits: plan → write tests → minimal change → update docs.
+- Always propose unit tests before edits and run them after edits to verify correctness.
+- Follow project layout: `/src /tests /docs`. Keep READMEs and docs updated alongside code changes.
+- Respect `.gitignore` and existing configuration (Black, Flake8). Use env vars for credentials; never hardcode secrets.
+- Use parameterized queries, input validation, and safe file I/O. Avoid destructive commands unless explicitly approved.
+- Produce diffs and commands in shell-agnostic form (show commands, don't just run them destructively).
+- When unsure: ask for constraints, then proceed with the smallest reversible step.
+
 Big picture (where to look)
 - Entry / UI: `run.py` and `src/gui/app.py` (desktop GUI built with tkinter/ttk via `ttkbootstrap`).
 - Providers & configuration: `src/providers/*.json` — these JSON files describe provider endpoints and field mappings.
@@ -73,5 +83,10 @@ pytest -q tests/test_uspto_integration.py::test_search_flow -k search_flow
 Safety and review notes
 - When changing commit history, avoid rewriting published history unless instructed by the repository owner. For test data / cassettes, prefer adding new recordings rather than modifying old ones.
 - Avoid introducing network calls in unit tests; use `vcrpy` or mocking helpers in `src/utils`.
+- Never introduce secrets into commits. Use environment variables and secret stores. Do not fetch untrusted code.
+- Apply input validation on user-facing inputs and use safe file I/O patterns (e.g., avoid path traversal).
+
+When unsure
+- Ask for constraints and clarification, then proceed with the smallest reversible step.
 
 If anything is unclear or you need a specific example expanded (provider JSON fields, client auth flow, or test cassette locations), tell me which area and I'll update this file.
